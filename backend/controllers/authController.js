@@ -49,36 +49,6 @@ const signup = async (req, res) => {
 };
 
 
-// const signup =  async (req, res) => {
-//   const { name, email, password,confirmPassword, mobile } = req.body;
-//   // console.log(req.body);
-
-//   try {
-//     // console.log(req.body)
-//     const hashedPassword = await bcrypt.hash(password, 10);
-//     // console.log(hashedPassword)
-//     const company = new Company({ name, email, password: hashedPassword, mobile });
-//     // console.log(company)
-//     await company.save();
-//     console.log(Company)
-
-//     // Send verification email
-//     const verificationToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-//     const verificationLink = `${process.env.CLIENT_URL}/verify-email?token=${verificationToken}`;
-//     console.log(verificationLink,verificationToken)
-
-//     await transporter.sendMail({
-//       from: process.env.EMAIL_USER,
-//       to: email,
-//       subject: 'Verify Your Email',
-//       html: `<p>Click <a href="${verificationLink}">here</a> to verify your email.</p>`
-//     });
-
-//     res.status(201).send({ message: 'Registration successful. Check your email for verification.' });
-//   } catch (error) {
-//     res.status(500).send({ message: 'Registration failed', error });
-//   }
-// };
 
 // Email Verification
 const verify_Email = async (req, res) => {
@@ -124,7 +94,11 @@ const login =  async (req, res) => {
     if (!isPasswordValid) return res.status(401).send({ message: 'Invalid credentials' });
 
     const token = jwt.sign({ id: company._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.cookie('token', token, { httpOnly: true }).send({ message: 'Login successful' });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true, // Set to true in production (HTTPS required)
+      sameSite: 'None', // Required for cross-origin cookies
+    });
   } catch (error) {
     res.status(500).send({ message: 'Login failed', error });
   }
