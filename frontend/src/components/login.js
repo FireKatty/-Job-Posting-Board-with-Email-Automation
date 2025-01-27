@@ -343,6 +343,8 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
+const API_BASE = 'https://job-posting-board-with-email-automation-ovws.onrender.com/api/auth';
+
 const BackgroundImage = styled.div`
   background: url('bg.jpg');
   height: 100vh;
@@ -499,7 +501,7 @@ const App = () => {
     e.preventDefault();
     setLoading(true);
     setError(null); // Reset error before submitting
-    const url = isLogin ? "https://job-posting-board-with-email-automation-qyi1.onrender.com/api/auth/login" : "https://job-posting-board-with-email-automation-qyi1.onrender.com/api/auth/register";
+    const url = isLogin ? `${API_BASE}/login` : `${API_BASE}/register`;
     const payload = isLogin
       ? { email: formData.email, password: formData.password }
       : formData;
