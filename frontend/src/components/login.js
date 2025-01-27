@@ -532,7 +532,8 @@ const App = () => {
         }
   
         // If login is successful and email is verified
-        if (isLogin && result.isVerified) {
+        console.log(isLogin,result)
+        if (isLogin && result.message === 'Login successful') {
           navigate("/post-job");
         } else {
           setError("Please verify your email before logging in.");
