@@ -499,7 +499,7 @@ const App = () => {
     e.preventDefault();
     setLoading(true);
     setError(null); // Reset error before submitting
-    const url = isLogin ? "https://job-posting-board-with-email-automation-wmgd.onrender.com/api/auth/login" : "https://job-posting-board-with-email-automation-wmgd.onrender.com/api/auth/register";
+    const url = isLogin ? "https://job-posting-board-with-email-automation-qyi1.onrender.com/api/auth/login" : "https://job-posting-board-with-email-automation-qyi1.onrender.com/api/auth/register";
     const payload = isLogin
       ? { email: formData.email, password: formData.password }
       : formData;

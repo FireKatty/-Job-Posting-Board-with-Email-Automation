@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE = 'https://job-posting-board-with-email-automation-wmgd.onrender.com/api';
+const API_BASE = 'https://job-posting-board-with-email-automation-qyi1.onrender.com/api';
 
 // Styled components
 const Container = styled.div`
@@ -191,7 +191,7 @@ function PostJob() {
 
   const handleLogout = () => {
     localStorage.removeItem('user'); // Clear user data from local storage
-    fetch('https://job-posting-board-with-email-automation-wmgd.onrender.com/api/auth/logout', {
+    fetch('https://job-posting-board-with-email-automation-qyi1.onrender.com/api/auth/logout', {
       method: 'POST',
       credentials: 'include', // Ensure cookies are sent for logout
     })

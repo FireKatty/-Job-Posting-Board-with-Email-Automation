@@ -13,7 +13,7 @@ const VerifyEmail = () => {
         
      
 
-        const response = await fetch(`https://job-posting-board-with-email-automation-wmgd.onrender.com/api/auth/verify-email?token=${token}`, {
+        const response = await fetch(`https://job-posting-board-with-email-automation-qyi1.onrender.com/api/auth/verify-email?token=${token}`, {
           method: 'GET',
         });
         // const data = await response.json();
