@@ -126,8 +126,8 @@ const CandidateError = styled.span`
 
 const Message = styled.p`
   margin-top: 15px;
-  font-size: 14px;
-  color: ${(props) => (props.success ? 'green' : 'red')};
+  font-size: 32px;
+  color: ${(props) => (props.success ? 'green' : 'chartreuse')};
 `;
 
 function PostJob() {
