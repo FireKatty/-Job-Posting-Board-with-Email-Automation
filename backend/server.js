@@ -5,9 +5,16 @@ const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser'); // dotenv module to load environment variables
 const app = express(); // Initialize Express application
 
+
+
+
+app.use(cors({
+  origin: 'http://localhost:3000', // Specify your frontend URL
+  credentials: true, // Allow cookies and credentials
+}));
+
 // Middleware
 app.use(express.json()); // Automatically parses JSON requests
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 
 // Load environment variables from .env file

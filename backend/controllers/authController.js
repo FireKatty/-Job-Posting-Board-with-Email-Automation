@@ -9,7 +9,7 @@ const transporter = require("../nodemailer/transporter")
 // Registration
 const signup =  async (req, res) => {
   const { name, email, password, mobile } = req.body;
-  // console.log(req.body);
+  console.log(req.body);
 
   try {
     // console.log(req.body)
@@ -54,6 +54,7 @@ const verify_Email =  async (req, res) => {
 // Login
 const login =  async (req, res) => {
   const { email, password } = req.body;
+  console.log(req.body)
 
   try {
     const company = await Company.findOne({ email });
