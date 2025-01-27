@@ -130,23 +130,12 @@ const login =  async (req, res) => {
   }
 };
 
-const handleLogout = () => {
-  localStorage.removeItem('user'); // Clear user data from local storage
-  fetch('http://localhost:9876/api/auth/logout', {
-    method: 'POST',
-    credentials: 'include', // Ensure cookies are sent for logout
-  })
-    .then((response) => {
-      if (response.ok) {
-        console.log('Logged out successfully');
-        navigate('/'); // Redirect to login
-      } else {
-        console.error('Failed to logout');
-      }
-    })
-    .catch((error) => console.error('Error during logout:', error));
+const logout = (req, res) => {
+  res
+    .clearCookie('token', { httpOnly: true, sameSite: 'Strict' }) // Clear the token cookie securely
+    .status(200) // Set HTTP status code for success
+    .send({ message: 'Logged out successfully' }); // Send a success message
 };
 
+module.exports = { signup, verify_Email, login, logout };
 
-
-module.exports = {signup,verify_Email,login,logout};
