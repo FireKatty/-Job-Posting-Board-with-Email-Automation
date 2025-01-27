@@ -118,7 +118,7 @@ const login = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true, // Ensures the cookie is not accessible via JavaScript (prevents XSS attacks)
       secure: process.env.NODE_ENV === 'production', // Ensures cookie is sent over HTTPS only in production
-      sameSite: 'Strict', // Prevents cookie from being sent in cross-site requests
+      sameSite: 'None', // Prevents cookie from being sent in cross-site requests
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Cookie expiration time (1 day)
     });
 
