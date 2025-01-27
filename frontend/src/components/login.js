@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = 'https://job-posting-board-with-email-automation-ovws.onrender.com/api/auth';
+const API_BASE = 'https://job-posting-board-with-email-automation-lr7m.onrender.com/api/auth';
 
 const BackgroundImage = styled.div`
   background: url('bg.jpg');
