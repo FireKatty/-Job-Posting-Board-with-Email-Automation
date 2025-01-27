@@ -9,7 +9,7 @@ const PrivateRoute = ({ children, allowedRole }) => {
   if (user) {
     return children;
   } else {
-    alert("Unauthorized access. Redirecting to login.");
+    // alert("Unauthorized access. Redirecting to login.");
     return <Navigate to="/" />;
   }
 };

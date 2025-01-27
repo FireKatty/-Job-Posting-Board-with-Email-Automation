@@ -1,6 +1,8 @@
 
+
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const API_BASE = 'http://localhost:9876/api';
 
@@ -9,7 +11,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-//   justify-content: center;
   padding: 20px;
   background-color: #f9f9f9;
   min-height: 100vh;
@@ -100,6 +101,15 @@ const DeleteButton = styled(Button)`
   }
 `;
 
+const LogoutButton = styled(Button)`
+  background-color: #ff5722;
+  &:hover {
+    background-color: #e64a19;
+  }
+  align-self: flex-end;
+  margin-bottom: 10px;
+`;
+
 const CandidateField = styled.div`
   display: flex;
   align-items: center;
@@ -107,13 +117,12 @@ const CandidateField = styled.div`
 `;
 
 const CandidateError = styled.span`
-  font-size: 18px; /* Adjust the size as needed */
-  color: black;    /* Change color if needed */
+  font-size: 18px;
+  color: black;
   margin-top: 10px;
   margin-bottom: 10px;
-  font-weight: bold; /* Optional: Add font-weight for emphasis */
+  font-weight: bold;
 `;
-
 
 const Message = styled.p`
   margin-top: 15px;
@@ -130,8 +139,8 @@ function PostJob() {
     candidates: [],
   });
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
-  // Validate email using regex
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -159,7 +168,6 @@ function PostJob() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if all emails are valid before submission
     const areAllEmailsValid = formData.candidates.every((candidate) => isValidEmail(candidate.email));
 
     if (!areAllEmailsValid) {
@@ -181,8 +189,26 @@ function PostJob() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('user'); // Clear user data from local storage
+    fetch('http://localhost:9876/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include', // Ensure cookies are sent for logout
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log('Logged out successfully');
+          navigate('/'); // Redirect to login
+        } else {
+          console.error('Failed to logout');
+        }
+      })
+      .catch((error) => console.error('Error during logout:', error));
+  };
+  
   return (
     <Container>
+      <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
       <Title>Post Job</Title>
       <Form onSubmit={handleSubmit}>
         <Input

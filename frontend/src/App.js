@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes,  Navigate } from 'react-router-
 import Login from './components/login';
 import PostJob from './components/jobPosting';
 import PrivateRoute from './ProtectRoutes/ProtectedRoute';
+import VerifyEmail from './components/verification';
 import './App.css';
 const App = () => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -12,6 +13,8 @@ const App = () => {
       <Routes>
         {/* Redirect to board if user is logged in, else show Login */}
         <Route path="/" element={user ? <Navigate to="/post-job" replace /> : <Login />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+
 
         {/* Protected Route for Kanban Board */}
         <Route

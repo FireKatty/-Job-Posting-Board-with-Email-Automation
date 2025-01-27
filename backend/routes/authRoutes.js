@@ -6,7 +6,7 @@ const {signup,verify_Email,login,logout} = require("../controllers/authControlle
 // Define the routes
 
 router.post('/register',signup);
-router.post('/verify-email',verify_Email);
+router.get('/verify-email',verify_Email);
 router.post('/login',login);
 router.post("/logout",logout);
 
