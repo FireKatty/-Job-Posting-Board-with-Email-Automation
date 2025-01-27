@@ -24,7 +24,7 @@ const jwt = require ("jsonwebtoken");
 // Middleware for Authentication
 
 const authenticateToken = (req, res, next) => {
-	// console.log(req.cookies)
+	console.log(req.cookies)
 	const token = req.cookies.token;
 	// console.log(token)
 

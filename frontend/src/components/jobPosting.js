@@ -1,72 +1,239 @@
+
 import React, { useState } from 'react';
+import styled from 'styled-components';
+
+const API_BASE = 'http://localhost:9876/api';
+
+// Styled components
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+//   justify-content: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+  background: url('bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+`;
+
+const Title = styled.h2`
+  margin-bottom: 20px;
+  color: white;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  @media (max-width: 600px) {
+    padding: 15px;
+    max-width: 90%;
+  }
+`;
+
+const Input = styled.input`
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid ${(props) => (props.isInvalid ? 'red' : '#ddd')};
+  border-radius: 5px;
+  &:focus {
+    outline: none;
+    border-color: ${(props) => (props.isInvalid ? 'red' : '#007bff')};
+    box-shadow: 0 0 3px ${(props) => (props.isInvalid ? 'rgba(255, 0, 0, 0.5)' : 'rgba(0, 123, 255, 0.5)')};
+  }
+`;
+
+const TextArea = styled.textarea`
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  resize: vertical;
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+  }
+`;
+
+const Select = styled.select`
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+`;
+
+const Button = styled.button`
+  padding: 10px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #28a745;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #218838;
+  }
+`;
+
+const AddButton = styled(Button)`
+  background-color: #007bff;
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
+const DeleteButton = styled(Button)`
+  background-color: #dc3545;
+  &:hover {
+    background-color: #c82333;
+  }
+`;
+
+const CandidateField = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const CandidateError = styled.span`
+  font-size: 18px; /* Adjust the size as needed */
+  color: black;    /* Change color if needed */
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-weight: bold; /* Optional: Add font-weight for emphasis */
+`;
 
 
-
-const API_BASE =  'http://localhost:9876/api';
+const Message = styled.p`
+  margin-top: 15px;
+  font-size: 14px;
+  color: ${(props) => (props.success ? 'green' : 'red')};
+`;
 
 function PostJob() {
-    const [formData, setFormData] = useState({ title: '', description: '', experienceLevel: 'BEGINNER', endDate: '', candidates: [] });
-    const [message, setMessage] = useState('');
-  
-    const handleChange = (e) => {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-  
-    const handleCandidateChange = (e, index) => {
-      const updatedCandidates = [...formData.candidates];
-      updatedCandidates[index] = { email: e.target.value };
-      setFormData({ ...formData, candidates: updatedCandidates });
-    };
-  
-    const addCandidateField = () => {
-      setFormData({ ...formData, candidates: [...formData.candidates, { email: '' }] });
-    };
-  
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-          const response = await fetch(`${API_BASE}/jobs`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify(formData),
-          });
-          const data = await response.json();
-          setMessage(data.message);
-        } catch (error) {
-          setMessage('Job posting failed');
-        }
-    };
-    
-  
-    return (
-      <div>
-        <h2>Post Job</h2>
-        <form onSubmit={handleSubmit}>
-          <input name="title" placeholder="Job Title" onChange={handleChange} required />
-          <textarea name="description" placeholder="Job Description" onChange={handleChange} required />
-          <select name="experienceLevel" onChange={handleChange}>
-            <option value="BEGINNER">BEGINNER</option>
-            <option value="INTERMEDIATE">INTERMEDIATE</option>
-            <option value="EXPERT">EXPERT</option>
-          </select>
-          <input name="endDate" type="date" onChange={handleChange} required />
-          <button type="button" onClick={addCandidateField}>Add Candidate</button>
-          {formData.candidates.map((candidate, index) => (
-            <input
-              key={index}
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    experienceLevel: 'BEGINNER',
+    endDate: '',
+    candidates: [],
+  });
+  const [message, setMessage] = useState('');
+
+  // Validate email using regex
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleCandidateChange = (e, index) => {
+    const updatedCandidates = [...formData.candidates];
+    updatedCandidates[index] = { email: e.target.value };
+    setFormData({ ...formData, candidates: updatedCandidates });
+  };
+
+  const addCandidateField = () => {
+    setFormData({ ...formData, candidates: [...formData.candidates, { email: '', isValid: true }] });
+  };
+
+  const deleteCandidateField = (index) => {
+    const updatedCandidates = formData.candidates.filter((_, i) => i !== index);
+    setFormData({ ...formData, candidates: updatedCandidates });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Check if all emails are valid before submission
+    const areAllEmailsValid = formData.candidates.every((candidate) => isValidEmail(candidate.email));
+
+    if (!areAllEmailsValid) {
+      setMessage('Please ensure all candidate emails are valid.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/jobs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      setMessage(data.message);
+    } catch (error) {
+      setMessage('Job posting failed');
+    }
+  };
+
+  return (
+    <Container>
+      <Title>Post Job</Title>
+      <Form onSubmit={handleSubmit}>
+        <Input
+          name="title"
+          placeholder="Job Title"
+          onChange={handleChange}
+          required
+        />
+        <TextArea
+          name="description"
+          placeholder="Job Description"
+          rows="4"
+          onChange={handleChange}
+          required
+        />
+        <Select name="experienceLevel" onChange={handleChange}>
+          <option value="BEGINNER">BEGINNER</option>
+          <option value="INTERMEDIATE">INTERMEDIATE</option>
+          <option value="EXPERT">EXPERT</option>
+        </Select>
+        <Input
+          name="endDate"
+          type="date"
+          onChange={handleChange}
+          required
+        />
+        <AddButton type="button" onClick={addCandidateField}>
+          Add Candidate
+        </AddButton>
+        {formData.candidates.map((candidate, index) => (
+          <CandidateField key={index}>
+            <Input
               placeholder="Candidate Email"
               value={candidate.email}
               onChange={(e) => handleCandidateChange(e, index)}
+              isInvalid={!isValidEmail(candidate.email)}
               required
             />
-          ))}
-          <button type="submit">Post Job</button>
-        </form>
-        {message && <p>{message}</p>}
-      </div>
-    );
+            <DeleteButton type="button" onClick={() => deleteCandidateField(index)}>
+              Delete
+            </DeleteButton>
+            {!isValidEmail(candidate.email) && (
+              <CandidateError>Invalid email format</CandidateError>
+            )}
+          </CandidateField>
+        ))}
+        <Button type="submit">Post Job</Button>
+      </Form>
+      {message && <Message success={message === 'Job posted successfully'}>{message}</Message>}
+    </Container>
+  );
 }
 
 export default PostJob;
-  

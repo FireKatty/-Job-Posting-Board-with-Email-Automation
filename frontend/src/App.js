@@ -1,27 +1,33 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
-
-import './App.css';
-import Register from './components/registration';
+import { BrowserRouter as Router, Route, Routes,  Navigate } from 'react-router-dom';
 import Login from './components/login';
 import PostJob from './components/jobPosting';
+import PrivateRoute from './ProtectRoutes/ProtectedRoute';
+import './App.css';
+const App = () => {
+  const user = JSON.parse(localStorage.getItem("user"));
 
-function App() {
   return (
     <Router>
-      <nav>
-        <Link to="/register">Register</Link>
-        <Link to="/login">Login</Link>
-        <Link to="/post-job">Post Job</Link>
-      </nav>
       <Routes>
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/post-job" element={<PostJob />} />
-        <Route path="*" element={<Navigate to="/register" />} />
+        {/* Redirect to board if user is logged in, else show Login */}
+        <Route path="/" element={user ? <Navigate to="/post-job" replace /> : <Login />} />
+
+        {/* Protected Route for Kanban Board */}
+        <Route
+          path="/post-job"
+          element={
+            <PrivateRoute>
+                <PostJob />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Redirect invalid routes */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;
