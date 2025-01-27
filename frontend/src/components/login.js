@@ -494,12 +494,12 @@ const App = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null); // Reset error before submitting
-    const url = isLogin ? "http://localhost:9876/api/auth/login" : "http://localhost:9876/api/auth/register";
+    const url = isLogin ? "https://job-posting-board-with-email-automation-wmgd.onrender.com/api/auth/login" : "https://job-posting-board-with-email-automation-wmgd.onrender.com/api/auth/register";
     const payload = isLogin
       ? { email: formData.email, password: formData.password }
       : formData;

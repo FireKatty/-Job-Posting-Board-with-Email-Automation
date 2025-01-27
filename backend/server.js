@@ -9,7 +9,7 @@ const app = express(); // Initialize Express application
 
 
 app.use(cors({
-  origin: 'http://localhost:3000', // Specify your frontend URL
+  origin: 'https://job-posting-board-with-email-automation.vercel.app/', // Specify your frontend URL
   credentials: true, // Allow cookies and credentials
 }));
 
