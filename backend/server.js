@@ -6,13 +6,23 @@ const cookieParser = require('cookie-parser'); // dotenv module to load environm
 const app = express(); // Initialize Express application
 
 
+// const corsOptions = {
+//   origin: "https://job-posting-board-with-email-automation.vercel.app", // Specific frontend URL
+//   credentials: true, // Allow credentials (cookies, etc.)
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow all necessary HTTP methods
+//   allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
+// };
+
+// app.use(cors(corsOptions));
+
+// CORS configuration
 const corsOptions = {
-  origin: "https://job-posting-board-with-email-automation.vercel.app", // Allow this specific origin
-  credentials: true, // Include credentials (cookies, authorization headers)
+  origin:"https://job-posting-board-with-email-automation.vercel.app" ,
+  credentials: true, // Allow credentials (cookies, etc.)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
-
 app.use(cors(corsOptions));
-
 
 // Middleware
 app.use(express.json()); // Automatically parses JSON requests

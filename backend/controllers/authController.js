@@ -81,9 +81,28 @@ const verify_Email = async (req, res) => {
 };
 
 // Login
-const login =  async (req, res) => {
+// const login =  async (req, res) => {
+//   const { email, password } = req.body;
+//   console.log(req.body)
+
+//   try {
+//     const company = await Company.findOne({ email });
+//     if (!company) return res.status(404).send({ message: 'Company not found' });
+//     if (!company.isVerified) return res.status(401).send({ message: 'Verify your email first' });
+
+//     const isPasswordValid = await bcrypt.compare(password, company.password);
+//     if (!isPasswordValid) return res.status(401).send({ message: 'Invalid credentials' });
+
+//     const token = jwt.sign({ id: company._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+//     res.cookie('token', token, { httpOnly: true }).send({ message: 'Login successful' });
+//   } catch (error) {
+//     res.status(500).send({ message: 'Login failed', error });
+//   }
+// };
+
+const login = async (req, res) => {
   const { email, password } = req.body;
-  console.log(req.body)
+  console.log(req.body);
 
   try {
     const company = await Company.findOne({ email });
@@ -94,16 +113,21 @@ const login =  async (req, res) => {
     if (!isPasswordValid) return res.status(401).send({ message: 'Invalid credentials' });
 
     const token = jwt.sign({ id: company._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false, // Use true in production (requires HTTPS)
-      sameSite: "None", // Allows cross-origin cookies
-    }).send({ message: "Login successful" });
-    
+
+    // Set the cookie with additional options for security and accessibility
+    res.cookie('token', token, {
+      httpOnly: true, // Ensures the cookie is not accessible via JavaScript (prevents XSS attacks)
+      secure: process.env.NODE_ENV === 'production', // Ensures cookie is sent over HTTPS only in production
+      sameSite: 'Strict', // Prevents cookie from being sent in cross-site requests
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Cookie expiration time (1 day)
+    });
+
+    res.status(200).send({ message: 'Login successful' });
   } catch (error) {
     res.status(500).send({ message: 'Login failed', error });
   }
 };
+
 
 const logout = (req, res) => {
   res
