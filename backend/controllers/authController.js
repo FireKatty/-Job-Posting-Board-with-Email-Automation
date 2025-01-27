@@ -94,11 +94,12 @@ const login =  async (req, res) => {
     if (!isPasswordValid) return res.status(401).send({ message: 'Invalid credentials' });
 
     const token = jwt.sign({ id: company._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.cookie('token', token, {
+    res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // Set to true in production (HTTPS required)
-      sameSite: 'None', // Required for cross-origin cookies
-    });
+      secure: false, // Use true in production (requires HTTPS)
+      sameSite: "None", // Allows cross-origin cookies
+    }).send({ message: "Login successful" });
+    
   } catch (error) {
     res.status(500).send({ message: 'Login failed', error });
   }
