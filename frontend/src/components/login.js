@@ -236,8 +236,6 @@ const handleSubmit = async (e) => {
       } else {
         // Successful login
         setError(null);
-        localStorage.setItem("user", JSON.stringify(result));
-  
        // Save user details to localStorage upon login
         if (isLogin) {
           localStorage.setItem("user", JSON.stringify(result));

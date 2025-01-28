@@ -189,6 +189,7 @@ function PostJob() {
     }
   };
 
+
   const handleLogout = () => {
     localStorage.removeItem("user"); // Clear user data from localStorage
     navigate('/'); // Redirect to login
