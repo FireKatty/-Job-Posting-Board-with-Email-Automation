@@ -4,11 +4,15 @@
   "description": "1->Clone the Repository: If you haven't already cloned your repository, do it by running the following command in your terminal:",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "frontend": "cd frontend && npm start",
+    "backend": "cd backend && nodemon server.js",
+    "start": "concurrently -n \"frontend,backend\" -c \"bgBlue,bgYellow\" \"npm run frontend\" \"npm run backend\" "
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "-job-posting-board-with-email-automation": "file:",
     "concurrently": "^9.1.2"
   }
 }

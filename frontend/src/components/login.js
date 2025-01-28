@@ -145,6 +145,7 @@ const App = () => {
       email: "",
       password: "",
       confirmPassword: "",
+      mobile: "",
     });
     setError(null); // Reset error when toggling between login/signup
   }, [isLogin]);
@@ -157,65 +158,53 @@ const App = () => {
   };
 
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setLoading(true);
-//     setError(null); // Reset error before submitting
-//     const url = isLogin ? `${API_BASE}/login` : `${API_BASE}/register`;
-//     const payload = isLogin
-//       ? { email: formData.email, password: formData.password }
-//       : formData;
-  
-//     try {
-//       const response = await fetch(url, {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(payload),
-//       });
-//       const result = await response.json();
-  
-//       if (!response.ok) {
-//         // Handle registration errors
-//         if (result.message === 'Email is already registered but not verified. Please verify your email first.') {
-//           setError("You are already registered. Please verify your email first.");
-//         } else {
-//           setError(result.message || "An error occurred");
-//         }
-//       } else {
-//         // Successful registration
-//         setError(null);
-//         localStorage.setItem("user", JSON.stringify(result));
-  
-//         // Display success message or direct user to verify email
-//         if (!isLogin) {
-//           setError("Registration successful. Please check your email for verification.");
-//         }
-  
-//         // If login is successful and email is verified
-//         console.log(isLogin,result)
-//         if (isLogin && result.message === 'Login successful') {
-//           navigate("/post-job");
-//         } else {
-//           setError("Please verify your email before logging in.");
-//         }
-//       }
-//     } catch (error) {
-//       setError("Failed to connect to the server.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null); // Reset error before submitting
+
+    // Ensure all required fields are filled
+    const { password, confirmPassword, mobile  } = formData;
+
+
+  // Validate mobile number
+  const mobileRegex = /^[1-9][0-9]{9}$/; // Ensures 10 digits and does not start with 0
+  if (!mobileRegex.test(mobile)) {
+    setError("Please enter a valid 10-digit mobile number that does not start with 0.");
+    setLoading(false);
+    return;
+  }else{
+    setError("");
+    setLoading(true);
+  }
+
+  // Validate password strength
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+  if (!passwordRegex.test(password)) {
+    setError("Password must be at least 8 characters long, contain atleast one uppercase letter, and one special character.");
+    setLoading(false);
+    return;
+  }else{
+    setError("");
+    setLoading(true);
+  }
+
+  // If it's a registration form, check if password and confirm password match
+  if (!isLogin && password !== confirmPassword) {
+    setError("Passwords do not match.");
+    setLoading(false);
+    return;
+  }else{
+    setError("");
+    setLoading(true);
+  }
+    
+  
     const url = isLogin ? `${API_BASE}/login` : `${API_BASE}/register`;
     const payload = isLogin
       ? { email: formData.email, password: formData.password }
       : formData;
-  
+
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -223,9 +212,9 @@ const handleSubmit = async (e) => {
         body: JSON.stringify(payload),
         credentials: 'include', // Make sure cookies are included in the request
       });
-  
+
       const result = await response.json();
-  
+
       if (!response.ok) {
         // Handle registration errors
         if (result.message === 'Email is already registered but not verified. Please verify your email first.') {
@@ -236,7 +225,8 @@ const handleSubmit = async (e) => {
       } else {
         // Successful login
         setError(null);
-       // Save user details to localStorage upon login
+
+        // Save user details to localStorage upon login
         if (isLogin) {
           localStorage.setItem("user", JSON.stringify(result));
           navigate("/post-job"); // Redirect to post-job
@@ -244,14 +234,13 @@ const handleSubmit = async (e) => {
           setError("Registration successful. Please verify your email.");
         }
       }
-  } catch (error) {
-    setError("Failed to connect to the server.");
-  } finally {
-    setLoading(false);
+    } catch (error) {
+      setError("Failed to connect to the server.");
+    } finally {
+      setLoading(false);
     }
   };
-  
-  
+
   
   return (
     <BackgroundImage>
