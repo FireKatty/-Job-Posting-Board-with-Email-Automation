@@ -135,6 +135,7 @@ const App = () => {
     password: "",
     confirmPassword: "",
   });
+  const [error, setError] = useState({}); // To store individual field errors
   const [errors, setErrors] = useState({}); // To store individual field errors
   const [loading, setLoading] = useState(false); // Loading state
   const navigate = useNavigate();
@@ -211,20 +212,23 @@ const App = () => {
 
       if (!response.ok) {
         if (result.message === "Email is already registered but not verified. Please verify your email first.") {
-          setErrors({ email: "You are already registered. Please verify your email first." });
+          setError({ email: "You are already registered. Please verify your email first." });
+          setTimeout(() => setError(''), 5000); // Clear message after 5 seconds
         } else {
-          setErrors({ email: result.message || "An error occurred" });
+          setError({ email: result.message || "An error occurred" });
         }
       } else {
         if (isLogin) {
           localStorage.setItem("user", JSON.stringify(result));
           navigate("/post-job");
         } else {
-          setErrors({ email: "Registration successful. Please verify your email." });
+          setError({ email: "Registration successful. Please verify your email." });
+          setTimeout(() => setError(''), 5000); // Clear message after 5 seconds
         }
       }
     } catch (error) {
-      setErrors({ email: "Failed to connect to the server." });
+      setError({ email: "Failed to connect to the server." });
+      setTimeout(() => setError(''), 5000); // Clear message after 5 seconds
     } finally {
       setLoading(false);
     }
@@ -309,6 +313,7 @@ const App = () => {
           )}
           <SubmitButton type="submit" value={isLogin ? "LOGIN" : "SIGNUP"} />
         </form>
+        {error && <ErrorText>{error.email}</ErrorText>} 
         {loading && <p style={{ color: "white" }}>Processing...</p>}
         <SignupText>
           {isLogin ? "Don't have an account? " : "Already have an account? "}
