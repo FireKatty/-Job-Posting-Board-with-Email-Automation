@@ -120,11 +120,11 @@ const SignupText = styled.div`
 `;
 
 const ErrorText = styled.div`
-  color: red;
-  font-size: 14px;
-  margin-top: 10px;
+  color: #ff4d4f; /* Bright red for visibility */
+  font-size: 0.85rem; /* Slightly smaller font size */
+  margin-top: 4px; /* Space between the input and the error */
+  margin-left: 8px; /* Align with input padding for consistency */
 `;
-
 const App = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -135,7 +135,7 @@ const App = () => {
     password: "",
     confirmPassword: "",
   });
-  const [error, setError] = useState(null); // Error state
+  const [errors, setErrors] = useState({}); // To store individual field errors
   const [loading, setLoading] = useState(false); // Loading state
   const navigate = useNavigate();
 
@@ -143,11 +143,11 @@ const App = () => {
     setFormData({
       name: "",
       email: "",
+      mobile: "",
       password: "",
       confirmPassword: "",
-      mobile: "",
     });
-    setError(null); // Reset error when toggling between login/signup
+    setErrors({}); // Reset errors when toggling between login/signup
   }, [isLogin]);
 
   const toggleForm = () => setIsLogin(!isLogin);
@@ -155,93 +155,81 @@ const App = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: "" }); // Clear error for the field being edited
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null); // Reset error before submitting
+    const { name, email, mobile, password, confirmPassword } = formData;
+    const newErrors = {};
 
-    // Ensure all required fields are filled
-    const { password, confirmPassword, mobile  } = formData;
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
 
+    // Validate mobile number
+    const mobileRegex = /^[1-9][0-9]{9}$/; // Ensures 10 digits and does not start with 0
+    if (!isLogin && !mobileRegex.test(mobile)) {
+      newErrors.mobile = "Please enter a valid 10-digit mobile number that does not start with 0.";
+    }
 
-  // Validate mobile number
-  const mobileRegex = /^[1-9][0-9]{9}$/; // Ensures 10 digits and does not start with 0
-  if (!mobileRegex.test(mobile)) {
-    setError("Please enter a valid 10-digit mobile number that does not start with 0.");
-    setLoading(false);
-    return;
-  }else{
-    setError("");
-    setLoading(true);
-  }
+    // Validate password strength
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      newErrors.password = "8+ chars,1 uppercase & special char.";
+    }
 
-  // Validate password strength
-  const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
-  if (!passwordRegex.test(password)) {
-    setError("Password must be at least 8 characters long, contain atleast one uppercase letter, and one special character.");
-    setLoading(false);
-    return;
-  }else{
-    setError("");
-    setLoading(true);
-  }
+    // Validate confirm password
+    if (!isLogin && password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match.";
+    }
 
-  // If it's a registration form, check if password and confirm password match
-  if (!isLogin && password !== confirmPassword) {
-    setError("Passwords do not match.");
-    setLoading(false);
-    return;
-  }else{
-    setError("");
-    setLoading(true);
-  }
-    
-  
+    // Stop submission if there are errors
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setLoading(false);
+      return;
+    }
+
     const url = isLogin ? `${API_BASE}/login` : `${API_BASE}/register`;
     const payload = isLogin
-      ? { email: formData.email, password: formData.password }
-      : formData;
+      ? { email, password }
+      : { name, email, mobile, password };
 
     try {
       const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-        credentials: 'include', // Make sure cookies are included in the request
+        credentials: "include", // Include cookies in the request
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        // Handle registration errors
-        if (result.message === 'Email is already registered but not verified. Please verify your email first.') {
-          setError("You are already registered. Please verify your email first.");
+        if (result.message === "Email is already registered but not verified. Please verify your email first.") {
+          setErrors({ email: "You are already registered. Please verify your email first." });
         } else {
-          setError(result.message || "An error occurred");
+          setErrors({ email: result.message || "An error occurred" });
         }
       } else {
-        // Successful login
-        setError(null);
-
-        // Save user details to localStorage upon login
         if (isLogin) {
           localStorage.setItem("user", JSON.stringify(result));
-          navigate("/post-job"); // Redirect to post-job
+          navigate("/post-job");
         } else {
-          setError("Registration successful. Please verify your email.");
+          setErrors({ email: "Registration successful. Please verify your email." });
         }
       }
     } catch (error) {
-      setError("Failed to connect to the server.");
+      setErrors({ email: "Failed to connect to the server." });
     } finally {
       setLoading(false);
     }
   };
 
-  
   return (
     <BackgroundImage>
       <Content>
@@ -271,7 +259,7 @@ const App = () => {
               placeholder="Email"
             />
           </Field>
-
+          {errors.email && <ErrorText>{errors.email}</ErrorText>}
           <Field space>
             <Icon className="fa fa-lock" />
             <Input
@@ -289,6 +277,7 @@ const App = () => {
               <i className={passwordVisible ? "fa fa-eye-slash" : "fa fa-eye"} />
             </ShowButton>
           </Field>
+          {errors.password && <ErrorText>{errors.password}</ErrorText>}
           {!isLogin && (
             <>
               <Field space>
@@ -301,7 +290,9 @@ const App = () => {
                   required
                   placeholder="Confirm Password"
                 />
+                {/* {errors.confirmPassword && <ErrorText>{errors.confirmPassword}</ErrorText>} */}
               </Field>
+              {errors.confirmPassword && <ErrorText>{errors.confirmPassword}</ErrorText>}
               <Field space>
                 <Icon className="fa fa-phone" />
                 <Input
@@ -313,11 +304,11 @@ const App = () => {
                   placeholder="Phone Number"
                 />
               </Field>
+              {errors.mobile && <ErrorText>{errors.mobile}</ErrorText>}
             </>
           )}
           <SubmitButton type="submit" value={isLogin ? "LOGIN" : "SIGNUP"} />
         </form>
-        {error && <ErrorText>{error}</ErrorText>} {/* Render error message if any */}
         {loading && <p style={{ color: "white" }}>Processing...</p>}
         <SignupText>
           {isLogin ? "Don't have an account? " : "Already have an account? "}
@@ -331,4 +322,3 @@ const App = () => {
 };
 
 export default App;
-
