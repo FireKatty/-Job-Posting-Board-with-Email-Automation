@@ -148,6 +148,7 @@ const App = () => {
       password: "",
       confirmPassword: "",
     });
+    setError({});
     setErrors({}); // Reset errors when toggling between login/signup
   }, [isLogin]);
 
