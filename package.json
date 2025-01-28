@@ -1,0 +1,14 @@
+{
+  "name": "-job-posting-board-with-email-automation",
+  "version": "1.0.0",
+  "description": "1->Clone the Repository: If you haven't already cloned your repository, do it by running the following command in your terminal:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
