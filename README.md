@@ -1,5 +1,7 @@
 # -Job-Posting-Board-with-Email-Automation
 
+## Please ensure that browser allow third parties cookies
+
 # Steps to Set Up the Application:
 
 1->Clone the Repository: If you haven't already cloned your repository, do it by running the following command in your terminal:
