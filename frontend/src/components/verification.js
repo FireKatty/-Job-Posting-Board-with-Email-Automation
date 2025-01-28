@@ -1,24 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Navigate } from 'react-router-dom';
-
+const API_BASE = 'https://job-posting-board-with-email-automation-lr7m.onrender.com/api';
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const [verificationStatus, setVerificationStatus] = useState(null);
-//   console.log(token)
+  const [redirect, setRedirect] = useState(false); // State to control redirection
 
   useEffect(() => {
     const verifyEmail = async () => {
       try {
-        
-     
-
-        const response = await fetch(`https://job-posting-board-with-email-automation-lr7m.onrender.com/api/auth/verify-email?token=${token}`, {
+        const response = await fetch(`${API_BASE}/auth/verify-email?token=${token}`, {
           method: 'GET',
         });
-        // const data = await response.json();
-        // console.log(response)
-        setVerificationStatus(response.ok ? 'success' : 'failed');
+
+        if (response.ok) {
+          setVerificationStatus('success');
+          // After 3 seconds, trigger redirect
+          setTimeout(() => {
+            setRedirect(true); 
+            localStorage.clear(); // Clear any temporary data
+          }, 3000); 
+        } else {
+          setVerificationStatus('failed');
+        }
       } catch (error) {
         setVerificationStatus('failed');
       }
@@ -27,9 +32,12 @@ const VerifyEmail = () => {
     if (token) verifyEmail();
   }, [token]);
 
-  if (verificationStatus === 'success') {
-    alert("Email Verification Successful");
+  if (redirect) {
     return <Navigate to="/" replace />;
+  }
+
+  if (verificationStatus === 'success') {
+    return <div>Email Verification Successful! You will be redirected shortly...</div>;
   }
 
   if (verificationStatus === 'failed') {

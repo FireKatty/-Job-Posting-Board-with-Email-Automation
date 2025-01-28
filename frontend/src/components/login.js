@@ -238,21 +238,18 @@ const handleSubmit = async (e) => {
         setError(null);
         localStorage.setItem("user", JSON.stringify(result));
   
-        if (!isLogin) {
-          setError("Registration successful. Please check your email for verification.");
-        }
-  
-        // If login is successful
-        if (isLogin && result.message === 'Login successful') {
-          navigate("/post-job");
+       // Save user details to localStorage upon login
+        if (isLogin) {
+          localStorage.setItem("user", JSON.stringify(result));
+          navigate("/post-job"); // Redirect to post-job
         } else {
-          setError("Please verify your email before logging in.");
+          setError("Registration successful. Please verify your email.");
         }
       }
-    } catch (error) {
-      setError("Failed to connect to the server.");
-    } finally {
-      setLoading(false);
+  } catch (error) {
+    setError("Failed to connect to the server.");
+  } finally {
+    setLoading(false);
     }
   };
   

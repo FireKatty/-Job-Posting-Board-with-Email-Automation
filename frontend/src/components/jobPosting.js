@@ -190,21 +190,26 @@ function PostJob() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('user'); // Clear user data from local storage
-    fetch(`${API_BASE}/auth/logout`, {
-      method: 'POST',
-      credentials: 'include', // Ensure cookies are sent for logout
-    })
-      .then((response) => {
-        if (response.ok) {
-          console.log('Logged out successfully');
-          navigate('/'); // Redirect to login
-        } else {
-          console.error('Failed to logout');
-        }
-      })
-      .catch((error) => console.error('Error during logout:', error));
+    localStorage.removeItem("user"); // Clear user data from localStorage
+    navigate('/'); // Redirect to login
   };
+
+  // const handleLogout = () => {
+  //   localStorage.removeItem('user'); // Clear user data from local storage
+  //   fetch(`${API_BASE}/auth/logout`, {
+  //     method: 'POST',
+  //     credentials: 'include', // Ensure cookies are sent for logout
+  //   })
+  //     .then((response) => {
+  //       if (response.ok) {
+  //         console.log('Logged out successfully');
+  //         navigate('/'); // Redirect to login
+  //       } else {
+  //         console.error('Failed to logout');
+  //       }
+  //     })
+  //     .catch((error) => console.error('Error during logout:', error));
+  // };
   
   return (
     <Container>
