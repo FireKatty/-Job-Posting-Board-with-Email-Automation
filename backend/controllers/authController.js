@@ -1,4 +1,5 @@
 const Company  = require("../models/companySchema");
+const Otp = require('../models/otpSchema');
 const bcrypt  = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const transporter = require("../nodemailer/transporter")
@@ -128,6 +129,154 @@ const login = async (req, res) => {
   }
 };
 
+// Send OTP 
+const sendOtp = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required.' });
+  }
+
+  try {
+    // Remove any existing OTP for this email
+    await Otp.findOneAndDelete({ email });
+
+    // Generate a new OTP
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
+    // Hash the OTP before saving to the database
+    const hashedOtp = await bcrypt.hash(otp.toString(), 10);
+
+    // Set OTP expiration time (5 minutes from now)
+    const expiryTime = Date.now() + 5 * 60 * 1000;
+
+    // Save the new OTP record in the database
+    const newOtp = new Otp({
+      email,
+      otp: hashedOtp,
+      expiry: expiryTime,
+    });
+    await newOtp.save();
+
+    // Send the OTP via email using nodemailer
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'OTP For Password Reset',
+      html: `
+        <p>Dear User,</p>
+        <p>Your One-Time Password (OTP) for verification is:</p>
+        <h2>${otp}</h2>
+        <p>This OTP is valid for 5 minutes. Please do not share it with anyone.</p>
+        <p>If you did not request this OTP, please ignore this email.</p>
+        <br />
+        <p>Thank you,</p>
+        <p>Your Application Team</p>
+      `,
+    });
+
+    // Respond with a success message
+    res.status(200).json({ message: 'OTP sent successfully.' });
+  } catch (error) {
+    console.error('Error sending OTP:', error);
+    res.status(500).json({ message: 'Failed to send OTP.', error });
+  }
+};
+
+
+// Verify OTP
+const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: 'Email and OTP are required.' });
+  }
+
+  try {
+    // Find the OTP record for the provided email
+    const otpRecord = await Otp.findOne({ email });
+
+    if (!otpRecord) {
+      return res.status(404).json({ message: 'Invalid OTP or email.' });
+    }
+
+    // Check if OTP has expired
+    const currentTime = Date.now();
+    if (currentTime > otpRecord.expiry) {
+      await Otp.deleteOne({ email }); // Clean up expired OTP
+      return res.status(410).json({ message: 'OTP has expired.' });
+    }
+
+    // Verify the OTP
+    const isMatch = await bcrypt.compare(otp, otpRecord.otp);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid OTP.' });
+    }
+
+    // OTP is valid; delete the record after successful verification
+    await Otp.deleteOne({ email });
+
+    return res.status(200).json({ message: 'OTP verified successfully.' });
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
+// Reset Password
+const resetPassword = async (req, res) => {
+  const { email, otp, password } = req.body;
+
+  // Validate input fields
+  if (!email || !otp || !password) {
+    return res.status(400).json({ message: 'All fields are required.' });
+  }
+
+  try {
+    // Find the OTP record associated with the email
+    const otpRecord = await Otp.findOne({ email });
+    if (!otpRecord) {
+      return res.status(400).json({ message: 'Invalid or expired OTP.' });
+    }
+
+    // // Check if the OTP has expired
+    // if (otpRecord.expiry < Date.now()) {
+    //   await Otp.deleteOne({ email }); // Remove expired OTP from the database
+    //   return res.status(400).json({ message: 'OTP has expired. Please request a new one.' });
+    // }
+
+    // Verify the OTP
+    const isOtpValid = await bcrypt.compare(otp.toString(), otpRecord.otp);
+    if (!isOtpValid) {
+      return res.status(400).json({ message: 'Invalid OTP.' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Update the user's password in the database
+    const user = await Company.findOneAndUpdate(
+      { email },
+      { password: hashedPassword },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Remove the OTP record after successful password reset
+    await Otp.deleteOne({ email });
+
+    // Respond with a success message
+    res.status(200).json({ message: 'Password reset successfully.' });
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({ message: 'An error occurred while resetting the password.', error });
+  }
+};
+
 
 const logout = (req, res) => {
   res
@@ -136,5 +285,5 @@ const logout = (req, res) => {
     .send({ message: 'Logged out successfully' }); // Send a success message
 };
 
-module.exports = { signup, verify_Email, login, logout };
+module.exports = { signup, verify_Email, login, sendOtp, verifyOtp , resetPassword ,logout };
 

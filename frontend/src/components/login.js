@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const API_BASE = 'https://job-posting-board-with-email-automation-lr7m.onrender.com/api/auth';
 
@@ -70,6 +70,7 @@ const Input = styled.input`
   font-family: 'Poppins', sans-serif;
 `;
 
+
 const ShowButton = styled.span`
   position: absolute;
   right: 13px;
@@ -81,6 +82,21 @@ const ShowButton = styled.span`
 
   i {
     font-size: 16px;
+  }
+`;
+
+const PasswordLink = styled.div`
+  text-align: left;
+  margin: 10px 0;
+
+  a {
+    color: white;
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;
 
@@ -295,7 +311,6 @@ const App = () => {
                   required
                   placeholder="Confirm Password"
                 />
-                {/* {errors.confirmPassword && <ErrorText>{errors.confirmPassword}</ErrorText>} */}
               </Field>
               {errors.confirmPassword && <ErrorText>{errors.confirmPassword}</ErrorText>}
               <Field space>
@@ -311,6 +326,12 @@ const App = () => {
               </Field>
               {errors.mobile && <ErrorText>{errors.mobile}</ErrorText>}
             </>
+          )}
+          {!isLogin && <div style={{ marginBottom: "16px" }}></div>} 
+           {isLogin && (
+            <PasswordLink>
+              <Link to="/forgot-password">Forgot Password?</Link>
+            </PasswordLink>
           )}
           <SubmitButton type="submit" value={isLogin ? "LOGIN" : "SIGNUP"} />
         </form>
